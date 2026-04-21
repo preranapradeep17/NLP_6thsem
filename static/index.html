@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NLP Intelligence Suite</title>
+  <meta name="description" content="Comparative Multitask NLP System — Sentiment Analysis, Machine Translation, and Text Summarization powered by Classical, Deep Learning, and Transformer models." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ===================== RESET & BASE ===================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #08110f;
+      --bg2:         #0f1b18;
+      --bg3:         #172723;
+      --card:        rgba(13, 22, 20, 0.86);
+      --card-hover:  #162925;
+      --border:      rgba(229,243,234,0.08);
+      --border-glow: rgba(255,145,77,0.28);
+
+      --accent1: #ff8a3d;
+      --accent2: #18c29c;
+      --accent3: #ffd166;
+      --accent-pos: #22d3a4;
+      --accent-neg: #ff6b6b;
+
+      --text:    #f2f6f0;
+      --text2:   #9eb2a7;
+      --text3:   #667a71;
+
+      --radius:  20px;
+      --radius-sm: 12px;
+      --shadow:  0 18px 60px rgba(0,0,0,0.45);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===================== ANIMATED BG ===================== */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 55% at 15% -10%, rgba(255,138,61,0.16) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 82% 110%, rgba(24,194,156,0.16) 0%, transparent 60%),
+        radial-gradient(circle at 50% 30%, rgba(255,209,102,0.05) 0%, transparent 45%);
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: radial-gradient(circle at center, black 35%, transparent 78%);
+      pointer-events: none;
+    }
+
+    /* ===================== HEADER ===================== */
+    header {
+      position: relative; z-index: 10;
+      text-align: center;
+      padding: 52px 20px 18px;
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,138,61,0.12);
+      border: 1px solid rgba(255,138,61,0.28);
+      border-radius: 100px;
+      padding: 6px 18px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--accent3);
+      margin-bottom: 22px;
+    }
+    .badge::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+    }
+
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #fff 18%, var(--accent3) 46%, var(--accent1) 72%, var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 14px;
+    }
+
+    header p {
+      color: var(--text2); font-size: 1.05rem; max-width: 520px; margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .hero-strip {
+      position: relative; z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      max-width: 920px;
+      margin: 0 auto 34px;
+      padding: 0 20px;
+    }
+
+    .hero-card {
+      background: rgba(12, 21, 19, 0.76);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px 18px;
+      text-align: left;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .hero-kicker {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 8px;
+    }
+
+    .hero-value {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .hero-copy {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text2);
+    }
+
+    /* ===================== TABS ===================== */
+    .tabs {
+      position: relative; z-index: 10;
+      display: flex; justify-content: center; gap: 8px;
+      padding: 0 20px 34px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      cursor: pointer;
+      padding: 11px 26px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text2);
+      font-family: inherit; font-size: 14px; font-weight: 500;
+      display: flex; align-items: center; gap: 8px;
+      transition: all 0.25s ease;
+      outline: none;
+      backdrop-filter: blur(10px);
+    }
+    .tab-btn:hover { border-color: var(--border-glow); color: var(--text); background: var(--card-hover); }
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      border-color: transparent;
+      color: #07110f;
+      box-shadow: 0 0 30px rgba(255,138,61,0.32);
+    }
+    .tab-btn .icon { font-size: 16px; }
+
+    /* ===================== MAIN CONTAINER ===================== */
+    .container {
+      position: relative; z-index: 10;
+      max-width: 980px; margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    /* ===================== PANEL ===================== */
+    .panel { display: none; }
+    .panel.active { display: block; animation: fadeUp 0.35s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel-card::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,138,61,0.75), rgba(24,194,156,0.7), transparent);
+    }
+
+    .panel-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent3);
+      margin-bottom: 10px;
+    }
+
+    .panel-title {
+      font-size: 1.15rem; font-weight: 700;
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .panel-title .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    }
+
+    .panel-subtitle {
+      color: var(--text2);
+      font-size: 0.98rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
+      max-width: 720px;
+    }
+
+    .example-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 0 0 16px;
+    }
+
+    .example-chip {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      color: var(--text2);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .example-chip:hover {
+      color: var(--text);
+      border-color: var(--border-glow);
+      background: rgba(255,138,61,0.08);
+      transform: translateY(-1px);
+    }
+
+    .helper-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .helper-copy {
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    .clear-btn {
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .clear-btn:hover {
+      color: var(--text);
+      border-color: var(--border-glow);
+    }
+
+    /* ===================== INPUTS ===================== */
+    textarea, input[type=text] {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif; font-size: 15px; line-height: 1.6;
+      padding: 16px 18px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    textarea:focus, input[type=text]:focus {
+      border-color: var(--border-glow);
+      box-shadow: 0 0 0 3px rgba(255,138,61,0.12);
+    }
+    textarea { min-height: 120px; }
+
+    .char-count {
+      text-align: right; font-size: 12px; color: var(--text3); margin-top: 6px;
+    }
+
+    .run-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 18px;
+      padding: 13px 30px;
+      border-radius: 100px;
+      border: none; cursor: pointer;
+      font-family: inherit; font-size: 15px; font-weight: 600;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      color: #07110f;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 22px rgba(255,138,61,0.26);
+    }
+    .run-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 30px rgba(255,138,61,0.35); }
+    .run-btn:active { transform: translateY(0); }
+    .run-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .run-btn .btn-icon { font-size: 17px; }
+
+    /* ===================== SPINNER ===================== */
+    .spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading .spinner { display: block; }
+    .loading .btn-icon { display: none; }
+    .loading .btn-text::after { content: 'ing…'; }
+
+    /* ===================== RESULTS ===================== */
+    .results { margin-top: 28px; display: none; }
+    .results.visible { display: block; animation: fadeUp 0.3s ease; }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+    }
+
+    .result-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px 20px;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+    }
+    .result-card:hover { border-color: var(--border-glow); transform: translateY(-2px); }
+
+    .result-card.featured {
+      border-color: rgba(255,138,61,0.35);
+      box-shadow: inset 0 0 0 1px rgba(255,138,61,0.08);
+    }
+
+    .result-card.caution {
+      border-color: rgba(255,107,107,0.32);
+    }
+
+    .result-card .model-name {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+      color: var(--text3); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+      flex-wrap: wrap;
+    }
+    .model-tag {
+      display: inline-block;
+      padding: 2px 8px; border-radius: 100px;
+      font-size: 10px; font-weight: 700;
+    }
+    .tag-classical { background: rgba(0,229,195,0.12); color: var(--accent3); }
+    .tag-dl        { background: rgba(79,142,247,0.12); color: var(--accent1); }
+    .tag-bert      { background: rgba(162,89,255,0.12); color: var(--accent2); }
+    .tag-transform { background: rgba(162,89,255,0.12); color: var(--accent2); }
+    .tag-textrank  { background: rgba(0,229,195,0.12); color: var(--accent3); }
+    .tag-t5        { background: rgba(79,142,247,0.12); color: var(--accent1); }
+
+    .result-value {
+      font-size: 15px; font-weight: 500; color: var(--text);
+      line-height: 1.55;
+      font-family: 'IBM Plex Mono', monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .result-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--text3);
+      line-height: 1.5;
+    }
+
+    .result-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .state-ready {
+      background: rgba(24,194,156,0.14);
+      color: var(--accent2);
+    }
+
+    .state-watch {
+      background: rgba(255,107,107,0.12);
+      color: var(--accent-neg);
+    }
+
+    .state-best {
+      background: rgba(255,138,61,0.14);
+      color: var(--accent1);
+    }
+
+    /* sentiment pill */
+    .sentiment-pill {
+      display: inline-block;
+      padding: 4px 14px; border-radius: 100px;
+      font-size: 14px; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .pill-pos { background: rgba(34,211,164,0.15); color: var(--accent-pos); }
+    .pill-neg { background: rgba(244,96,96,0.15);  color: var(--accent-neg); }
+
+    .conf-bar-wrap { margin-top: 10px; }
+    .conf-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+    .conf-bar {
+      height: 5px; border-radius: 100px;
+      background: var(--bg3); overflow: hidden;
+    }
+    .conf-fill {
+      height: 100%; border-radius: 100px;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    /* error box */
+    .error-box {
+      background: rgba(244,96,96,0.1);
+      border: 1px solid rgba(244,96,96,0.3);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      color: var(--accent-neg);
+      font-size: 14px;
+    }
+
+    /* Loading state overlay for results */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg3) 25%, var(--card-hover) 50%, var(--bg3) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer {
+      from { background-position: 200% 0; }
+      to   { background-position: -200% 0; }
+    }
+
+    /* ===================== FOOTER ===================== */
+    footer {
+      position: relative; z-index: 10;
+      text-align: center; padding: 20px;
+      color: var(--text3); font-size: 13px;
+      border-top: 1px solid var(--border);
+    }
+    footer span { color: var(--accent1); }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 600px) {
+      .panel-card { padding: 20px 16px; }
+      .results-grid { grid-template-columns: 1fr; }
+      .hero-strip { grid-template-columns: 1fr; }
+      .helper-row { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Comparative NLP System</div>
+  <h1>NLP Intelligence Suite</h1>
+  <p>Test the same input across classical pipelines, neural models, and transformers in one clean comparison workspace.</p>
+</header>
+
+<section class="hero-strip" aria-label="Capabilities overview">
+  <article class="hero-card">
+    <div class="hero-kicker">Sentiment</div>
+    <div class="hero-value">Fast polarity comparison</div>
+    <div class="hero-copy">See how TF-IDF, LSTM, and BERT react to the same opinionated sentence.</div>
+  </article>
+  <article class="hero-card">
+    <div class="hero-kicker">Translation</div>
+    <div class="hero-value">English to French</div>
+    <div class="hero-copy">Compare rule-based translation, your trained DL model, and MarianMT side by side.</div>
+  </article>
+  <article class="hero-card">
+    <div class="hero-kicker">Summarization</div>
+    <div class="hero-value">Extractive vs abstractive</div>
+    <div class="hero-copy">Check what each summarizer keeps, rewrites, and drops from the same passage.</div>
+  </article>
+</section>
+
+<!-- TABS -->
+<nav class="tabs" role="tablist">
+  <button class="tab-btn active" id="tab-sentiment" role="tab" aria-selected="true"  onclick="switchTab('sentiment')">
+    <span class="icon">💬</span> Sentiment Analysis
+  </button>
+  <button class="tab-btn" id="tab-translation" role="tab" aria-selected="false" onclick="switchTab('translation')">
+    <span class="icon">🌐</span> Translation
+  </button>
+  <button class="tab-btn" id="tab-summarization" role="tab" aria-selected="false" onclick="switchTab('summarization')">
+    <span class="icon">📝</span> Summarization
+  </button>
+</nav>
+
+<main class="container">
+
+  <!-- ===== SENTIMENT ===== -->
+  <section class="panel active" id="panel-sentiment" role="tabpanel">
+    <div class="panel-card">
+      <div class="panel-eyebrow">Opinion Signals</div>
+      <div class="panel-title"><div class="dot"></div>Sentiment Analysis</div>
+      <p class="panel-subtitle">Use this when you want a quick emotional read of a sentence. Great for reviews, reactions, and product feedback.</p>
+      <div class="example-row">
+        <button class="example-chip" onclick="fillExample('sent-input', 'sent-char', 'This product is absolutely amazing and worth every rupee.')">Positive review</button>
+        <button class="example-chip" onclick="fillExample('sent-input', 'sent-char', 'I regret buying this because the quality is terrible.')">Negative review</button>
+        <button class="example-chip" onclick="fillExample('sent-input', 'sent-char', 'The movie started slow but ended beautifully.')">Mixed opinion</button>
+      </div>
+      <textarea id="sent-input" placeholder="Enter a sentence to analyze sentiment… e.g. 'This product is absolutely amazing!'" oninput="updateChar('sent-char',this)"></textarea>
+      <div class="helper-row">
+        <div>
+          <div class="char-count" id="sent-char">0 characters</div>
+          <div class="helper-copy">Tip: press Enter to run, or Shift+Enter for a new line.</div>
+        </div>
+        <button class="clear-btn" type="button" onclick="clearInput('sent-input', 'sent-char', 'sent-results')">Clear</button>
+      </div>
+      <button class="run-btn" id="sent-btn" onclick="runSentiment()">
+        <span class="btn-icon">⚡</span>
+        <span class="spinner"></span>
+        <span class="btn-text">Analyz</span>e
+      </button>
+
+      <div class="results" id="sent-results">
+        <div class="results-grid" id="sent-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRANSLATION ===== -->
+  <section class="panel" id="panel-translation" role="tabpanel">
+    <div class="panel-card">
+      <div class="panel-eyebrow">Meaning Transfer</div>
+      <div class="panel-title"><div class="dot"></div>English → French Translation</div>
+      <p class="panel-subtitle">Best for quick bilingual comparison. The DL model now handles short familiar phrases better, while MarianMT is still the strongest general translator.</p>
+      <div class="example-row">
+        <button class="example-chip" onclick="fillExample('trans-input', 'trans-char', 'i love you')">Short phrase</button>
+        <button class="example-chip" onclick="fillExample('trans-input', 'trans-char', 'i am prerana')">Identity statement</button>
+        <button class="example-chip" onclick="fillExample('trans-input', 'trans-char', 'the book is on the table')">Simple sentence</button>
+      </div>
+      <textarea id="trans-input" placeholder="Enter English text to translate… e.g. 'Hello, my name is world.'" oninput="updateChar('trans-char',this)"></textarea>
+      <div class="helper-row">
+        <div>
+          <div class="char-count" id="trans-char">0 characters</div>
+          <div class="helper-copy">Tip: short familiar phrases are the easiest way to compare model behavior clearly.</div>
+        </div>
+        <button class="clear-btn" type="button" onclick="clearInput('trans-input', 'trans-char', 'trans-results')">Clear</button>
+      </div>
+      <button class="run-btn" id="trans-btn" onclick="runTranslation()">
+        <span class="btn-icon">🌐</span>
+        <span class="spinner"></span>
+        <span class="btn-text">Translat</span>e
+      </button>
+
+      <div class="results" id="trans-results">
+        <div class="results-grid" id="trans-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SUMMARIZATION ===== -->
+  <section class="panel" id="panel-summarization" role="tabpanel">
+    <div class="panel-card">
+      <div class="panel-eyebrow">Compression</div>
+      <div class="panel-title"><div class="dot"></div>Text Summarization</div>
+      <p class="panel-subtitle">Paste a multi-sentence paragraph to compare an extractive summary against a transformer-generated rewrite.</p>
+      <div class="example-row">
+        <button class="example-chip" onclick="fillExample('summ-input', 'summ-char', 'The city council met on Tuesday to discuss the rising traffic problem near the central market. Members proposed staggered school timings, improved bus routes, and a ban on heavy vehicles during peak hours. Several shop owners opposed the delivery restrictions, saying it would hurt business. Officials agreed to run a four-week pilot program before making a final decision.')">Civic report</button>
+        <button class="example-chip" onclick="fillExample('summ-input', 'summ-char', 'Researchers tested a new water purification filter in three villages over six months. The device reduced contamination levels significantly and lowered waterborne illness complaints. However, maintenance costs were higher than expected, and training local operators took longer than planned. The team now recommends a phased rollout with stronger community support.')">Research summary</button>
+      </div>
+      <textarea id="summ-input" style="min-height:160px" placeholder="Paste a long paragraph or article to summarize… (at least 2–3 sentences)" oninput="updateChar('summ-char',this)"></textarea>
+      <div class="helper-row">
+        <div>
+          <div class="char-count" id="summ-char">0 characters</div>
+          <div class="helper-copy">Tip: longer structured text gives the clearest extractive vs abstractive comparison.</div>
+        </div>
+        <button class="clear-btn" type="button" onclick="clearInput('summ-input', 'summ-char', 'summ-results')">Clear</button>
+      </div>
+      <button class="run-btn" id="summ-btn" onclick="runSummarization()">
+        <span class="btn-icon">✨</span>
+        <span class="spinner"></span>
+        <span class="btn-text">Summariz</span>e
+      </button>
+
+      <div class="results" id="summ-results">
+        <div class="results-grid" id="summ-grid"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Built with <span>♥</span> · Comparative Multitask NLP System
+</footer>
+
+<script>
+  /* ===================== TAB SWITCHING ===================== */
+  function switchTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.toggle('active', b.id === 'tab-' + name);
+      b.setAttribute('aria-selected', b.id === 'tab-' + name);
+    });
+    document.querySelectorAll('.panel').forEach(p => {
+      p.classList.toggle('active', p.id === 'panel-' + name);
+    });
+  }
+
+  /* ===================== CHAR COUNT ===================== */
+  function updateChar(id, el) {
+    document.getElementById(id).textContent = el.value.length + ' characters';
+  }
+
+  function fillExample(inputId, charId, text) {
+    const input = document.getElementById(inputId);
+    input.value = text;
+    updateChar(charId, input);
+    input.focus();
+  }
+
+  function clearInput(inputId, charId, resultsId) {
+    const input = document.getElementById(inputId);
+    input.value = '';
+    updateChar(charId, input);
+    document.getElementById(resultsId).classList.remove('visible');
+    input.focus();
+  }
+
+  /* ===================== LOADING STATE ===================== */
+  function setLoading(btnId, on) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = on;
+    btn.classList.toggle('loading', on);
+  }
+
+  /* ===================== POST HELPER ===================== */
+  async function post(url, body) {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    return resp.json();
+  }
+
+  /* ===================== SHOW ERROR ===================== */
+  function showError(gridId, resultsId, msg) {
+    const grid = document.getElementById(gridId);
+    grid.innerHTML = `<div class="error-box">⚠️ ${msg}</div>`;
+    document.getElementById(resultsId).classList.add('visible');
+  }
+
+  /* ===================== SENTIMENT ===================== */
+  async function runSentiment() {
+    const text = document.getElementById('sent-input').value.trim();
+    if (!text) return alert('Please enter some text first.');
+    setLoading('sent-btn', true);
+    document.getElementById('sent-results').classList.remove('visible');
+
+    try {
+      const data = await post('/api/sentiment', { text });
+      const grid = document.getElementById('sent-grid');
+
+      if (data.error) { showError('sent-grid', 'sent-results', data.error); return; }
+
+      const models = [
+        { key: 'classical', label: 'Classical (TF-IDF + LR)', tag: 'tag-classical', tagTxt: 'Classical' },
+        { key: 'dl',        label: 'Deep Learning (LSTM)',    tag: 'tag-dl',        tagTxt: 'LSTM' },
+        { key: 'bert',      label: 'Transformer (BERT)',      tag: 'tag-bert',      tagTxt: 'BERT' },
+      ];
+
+      grid.innerHTML = models.map(m => {
+        const r = data[m.key];
+        const isPos = r.label === 'Positive';
+        const conf = r.confidence != null ? r.confidence : null;
+        const stateClass = m.key === 'bert' ? 'state-best' : 'state-ready';
+        const stateText = m.key === 'bert' ? 'Strong' : 'Active';
+        return `
+        <div class="result-card">
+          <div class="model-name">
+            <span class="model-tag ${m.tag}">${m.tagTxt}</span>${m.label}
+            <span class="result-state ${stateClass}">${stateText}</span>
+          </div>
+          <span class="sentiment-pill ${isPos ? 'pill-pos' : 'pill-neg'}">
+            ${isPos ? '▲' : '▼'} ${r.label}
+          </span>
+          ${conf != null ? `
+          <div class="conf-bar-wrap">
+            <div class="conf-label">Confidence: ${(conf * 100).toFixed(1)}%</div>
+            <div class="conf-bar"><div class="conf-fill" style="width:${(conf*100).toFixed(1)}%"></div></div>
+          </div>` : ''}
+        </div>`;
+      }).join('');
+
+      document.getElementById('sent-results').classList.add('visible');
+    } catch(e) {
+      showError('sent-grid', 'sent-results', 'Server error. Is the backend running?');
+    } finally {
+      setLoading('sent-btn', false);
+    }
+  }
+
+  /* ===================== TRANSLATION ===================== */
+  async function runTranslation() {
+    const text = document.getElementById('trans-input').value.trim();
+    if (!text) return alert('Please enter some text first.');
+    setLoading('trans-btn', true);
+    document.getElementById('trans-results').classList.remove('visible');
+
+    try {
+      const data = await post('/api/translate', { text });
+      const grid = document.getElementById('trans-grid');
+
+      if (data.error) { showError('trans-grid', 'trans-results', data.error); return; }
+
+      const items = [
+        { label: 'Rule-Based (Dictionary)', tag: 'tag-classical', tagTxt: 'Classical', value: data.classical, note: 'Fast baseline for rough word-level mapping.' },
+        { label: 'Deep Learning (LSTM)',    tag: 'tag-dl',        tagTxt: 'LSTM',      value: data.dl, note: 'Best on short familiar phrases from the training setup.' },
+        { label: 'Transformer (MarianMT)',  tag: 'tag-transform', tagTxt: 'Transformer',value: data.transformer, note: 'Strongest general-purpose translator in this app.' },
+      ];
+
+      grid.innerHTML = items.map(item => {
+        const isTransformer = item.tagTxt === 'Transformer';
+        const isUncertain = String(item.value).toLowerCase().includes('uncertain');
+        const cardClass = isUncertain ? 'result-card caution' : (isTransformer ? 'result-card featured' : 'result-card');
+        const stateClass = isUncertain ? 'state-watch' : (isTransformer ? 'state-best' : 'state-ready');
+        const stateText = isUncertain ? 'Review' : (isTransformer ? 'Best' : 'Ready');
+        return `
+        <div class="${cardClass}">
+          <div class="model-name">
+            <span class="model-tag ${item.tag}">${item.tagTxt}</span>${item.label}
+            <span class="result-state ${stateClass}">${stateText}</span>
+          </div>
+          <div class="result-value">${escHtml(item.value)}</div>
+          <div class="result-note">${item.note}</div>
+        </div>
+      `}).join('');
+
+      document.getElementById('trans-results').classList.add('visible');
+    } catch(e) {
+      showError('trans-grid', 'trans-results', 'Server error. Is the backend running?');
+    } finally {
+      setLoading('trans-btn', false);
+    }
+  }
+
+  /* ===================== SUMMARIZATION ===================== */
+  async function runSummarization() {
+    const text = document.getElementById('summ-input').value.trim();
+    if (!text) return alert('Please enter some text first.');
+    setLoading('summ-btn', true);
+    document.getElementById('summ-results').classList.remove('visible');
+
+    try {
+      const data = await post('/api/summarize', { text });
+      const grid = document.getElementById('summ-grid');
+
+      if (data.error) { showError('summ-grid', 'summ-results', data.error); return; }
+
+      const items = [
+        { label: 'TextRank (Extractive)', tag: 'tag-textrank', tagTxt: 'TextRank', value: data.extractive, note: 'Keeps original wording and pulls key sentences.' },
+        { label: 'T5 Transformer (Abstractive)', tag: 'tag-t5', tagTxt: 'T5', value: data.abstractive, note: 'Rewrites the passage into a more compressed summary.' },
+      ];
+
+      grid.innerHTML = items.map(item => `
+        <div class="result-card ${item.tagTxt === 'T5' ? 'featured' : ''}">
+          <div class="model-name">
+            <span class="model-tag ${item.tag}">${item.tagTxt}</span>${item.label}
+            <span class="result-state ${item.tagTxt === 'T5' ? 'state-best' : 'state-ready'}">${item.tagTxt === 'T5' ? 'Rewrite' : 'Extract'}</span>
+          </div>
+          <div class="result-value" style="font-family:'Space Grotesk',sans-serif;font-size:14px;line-height:1.65">
+            ${escHtml(item.value)}
+          </div>
+          <div class="result-note">${item.note}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('summ-results').classList.add('visible');
+    } catch(e) {
+      showError('summ-grid', 'summ-results', 'Server error. Is the backend running?');
+    } finally {
+      setLoading('summ-btn', false);
+    }
+  }
+
+  /* ===================== UTILS ===================== */
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Allow Enter (without Shift) to submit in single-line feel for short inputs
+  document.querySelectorAll('textarea').forEach(ta => {
+    ta.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey && ta.value.split('\n').length <= 2) {
+        const panelId = ta.closest('.panel').id;
+        if (panelId === 'panel-sentiment')     { e.preventDefault(); runSentiment(); }
+        if (panelId === 'panel-translation')   { e.preventDefault(); runTranslation(); }
+        if (panelId === 'panel-summarization') { e.preventDefault(); runSummarization(); }
+      }
+    });
+  });
+</script>
+</body>
+</html>

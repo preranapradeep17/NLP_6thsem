@@ -1,0 +1,24 @@
+# Virtual environments
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Large datasets
+data/
+*.csv
+*.txt
+
+# Models
+*.pkl
+*.h5
+
+# OS files
+.DS_Storevenv/
+__pycache__/
+*.pyc
+*.keras
+*.h5
+.DS_Store

@@ -1,0 +1,17 @@
+venv/
+cleanenv/
+__pycache__/
+*.pkl
+*.csv
+temp_model/
+.DS_Storecleanenv/
+__pycache__/
+*.pkl
+*.csv
+temp_model/
+.DS_Storevenv/
+__pycache__/
+*.pyc
+*.keras
+*.h5
+.DS_Store

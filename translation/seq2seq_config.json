@@ -1,0 +1,6 @@
+{
+  "encoder_max_len": 12,
+  "decoder_max_len": 14,
+  "start_token": 2,
+  "end_token": 3
+}
